@@ -1,0 +1,49 @@
+
+
+Version:	3.50
+CmdLine:	C:\Users\Le\Desktop\java\music\MusicGame.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\Le\Desktop\java\music\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	1.011.000_000
+Java max ver:	1.018.000_001
+Substitute:	JAVA_HOME = 
+Substitute:	PATH = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\libnvvp;;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\xampp\php;C:\composer;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\Program Files\NVIDIA Corporation\Nsight Compute 2023.3.1\;C:\Users\Le\AppData\Local\Microsoft\WindowsApps;C:\Users\Le\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Le\AppData\Roaming\npm;C:\Users\Le\AppData\Roaming\Composer\vendor\bin;C:\Users\Le\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\Roaming\pypoetry\venv\Scripts;C:\Users\Le\.pyenv-win\pyenv-win\bin;C:\Users\Le\.pyenv-win\pyenv-win\shims;;C:\Program Files\Java\jdk-18.0.1.1\bin
+JRE paths:	;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\libnvvp;;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\xampp\php;C:\composer;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\Program Files\NVIDIA Corporation\Nsight Compute 2023.3.1\;C:\Users\Le\AppData\Local\Microsoft\WindowsApps;C:\Users\Le\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Le\AppData\Roaming\npm;C:\Users\Le\AppData\Roaming\Composer\vendor\bin;C:\Users\Le\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\Roaming\pypoetry\venv\Scripts;C:\Users\Le\.pyenv-win\pyenv-win\bin;C:\Users\Le\.pyenv-win\pyenv-win\shims;;C:\Program Files\Java\jdk-18.0.1.1\bin
+Check launcher:	C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3\libnvvp\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\Common Files\Oracle\Java\javapath\bin\javaw.exe (not found)
+Check launcher:	C:\Windows\system32\bin\javaw.exe (not found)
+Check launcher:	C:\Windows\bin\javaw.exe (not found)
+Check launcher:	C:\Windows\System32\Wbem\bin\javaw.exe (not found)
+Check launcher:	C:\Windows\System32\WindowsPowerShell\v1.0\bin\javaw.exe (not found)
+Check launcher:	C:\Windows\System32\OpenSSH\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\system32\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\System32\Wbem\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\System32\WindowsPowerShell\v1.0\bin\javaw.exe (not found)
+Check launcher:	C:\WINDOWS\System32\OpenSSH\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\nodejs\bin\javaw.exe (not found)
+Check launcher:	C:\xampp\php\bin\javaw.exe (not found)
+Check launcher:	C:\composer\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\dotnet\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\Git\cmd\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\NVIDIA Corporation\Nsight Compute 2023.3.1\bin\javaw.exe (not found)
+Check launcher:	C:\Users\Le\AppData\Local\Microsoft\WindowsApps\bin\javaw.exe (not found)
+Check launcher:	C:\Users\Le\AppData\Local\Programs\Microsoft VS Code\bin\javaw.exe (not found)
+Check launcher:	C:\Users\Le\AppData\Roaming\npm\bin\javaw.exe (not found)
+Check launcher:	C:\Users\Le\AppData\Roaming\Composer\vendor\bin\javaw.exe (not found)
+Check launcher:	C:\Users\Le\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\Roaming\pypoetry\venv\Scripts\bin\javaw.exe (not found)
+Check launcher:	C:\Users\Le\.pyenv-win\pyenv-win\bin\javaw.exe (not found)
+Check launcher:	C:\Users\Le\.pyenv-win\pyenv-win\shims\bin\javaw.exe (not found)
+Check launcher:	C:\Program Files\Java\jdk-18.0.1.1\bin\javaw.exe (OK)
+Warning:	formatJavaVersion() too many parts added.
+Version string: 1.018.000_001 / 64-Bit (OK)
+Launcher:	C:\Program Files\Java\jdk-18.0.1.1\bin\javaw.exe
+Launcher args:	-jar "C:\Users\Le\Desktop\java\music\MusicGame.exe"
+Args length:	51/32768 chars
+Exit code:	0
