@@ -27,8 +27,9 @@ public class effect extends JFrame {
 
     class AperturePanel extends JPanel {
         private Point2D center = new Point2D.Float(200, 200);
-        private float radius = 0;
+        private float radius = 50;
         private Timer timer;
+        private Graphics2D g2d;
 
         public AperturePanel() {
             addMouseListener(new MouseAdapter() {
@@ -40,15 +41,15 @@ public class effect extends JFrame {
                         timer.stop();
                     }
                     timer = new Timer(10, ae -> {
-                        radius += 1;
+                        radius += 10;
                         repaint();
-                        
+                        if (radius > 200) {
+                            radius = 50f;
+                            timer.stop();
+                        }
                     });
-                    
+
                     timer.start();
-                    if(radius>20){
-                        timer.stop();
-                    }
                 }
             });
         }
@@ -56,7 +57,7 @@ public class effect extends JFrame {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g;
+            g2d = (Graphics2D) g;
 
             // Enable anti-aliasing
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -71,5 +72,6 @@ public class effect extends JFrame {
             g2d.fillOval((int) center.getX() - (int) radius, (int) center.getY() - (int) radius, (int) radius * 2,
                     (int) radius * 2);
         }
+
     }
 }

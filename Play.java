@@ -1,11 +1,9 @@
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -22,16 +20,13 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-public class Play extends JPanel implements KeyListener, LineListener {
+public class Play extends GamePanel implements KeyListener, LineListener {
 
     // Screen Size
-    private int frameHeight;
-    private int frameWidth;
-    private Dimension screenSize;
+    private int songNumber;
 
     // Game State
     private int score;
@@ -46,40 +41,53 @@ public class Play extends JPanel implements KeyListener, LineListener {
 
     // Game Object
     protected int NOTE_SIZE = 60;
-    private int NOTE_SPEED = 3;
+    private int NOTE_SPEED = 5;
     protected Queue<Note> notes = new LinkedList<>();
     protected int noteIndex;
     private int hitAreaHeight;
     private boolean notesGeneratedFor = false;
+    private int hitAreaWidth[] = new int[4];
 
     // Game audio input
     private AudioInputStream mozart;
+    private AudioInputStream spiritedAway;
     protected Clip music;
     private Timer audioTimer;
 
+    // music note timing
+    private int[][] mozartTiming;
+    private int timeIndex;
+    private int noteNumber;
+    private int[][] spiritedAwayTiming;
     // other
     private DecimalFormat df = new DecimalFormat();
-    private Image resizedImage;
+    private Image MozartResizedImage;
+    private Image SpiritedAwayResizedImage;
     private int iconWidthPropotion;
+    private int combo;
+    private int maxCombo;
 
-    public Play(Dimension screenSize, int frameHeight, int frameWidth, int score, int perfect, int good, int bad,
-            int miss) {
-        this.screenSize = screenSize;
-        this.frameHeight = frameHeight;
-        this.frameWidth = frameWidth;
+    public Play(int score, int perfect, int good, int bad,
+            int miss, int timeIndex, int noteNumber, int combo) {
         this.score = score;
         this.perfect = perfect;
         this.good = good;
         this.bad = bad;
         this.miss = miss;
+        this.timeIndex = timeIndex;
+        this.noteNumber = noteNumber;
+        this.combo = combo;
     }
 
-    public Play() {
-        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frameHeight = screenSize.height;
-        frameWidth = screenSize.width;
-        hitAreaHeight = frameHeight * 8 / 10;
+    public Play(int songNumber) {
+        super();
+        this.songNumber = songNumber;
 
+        // set hit area location
+        hitAreaLocation();
+
+        // set music note timing
+        setTiming();
         // set image
         backgroundImage();
         // load audio
@@ -96,44 +104,51 @@ public class Play extends JPanel implements KeyListener, LineListener {
 
     }
 
+    protected void initializeComponents() {
+
+    }
+
     // KeyEvent method
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
         for (Iterator<Note> iterator = notes.iterator(); iterator.hasNext();) {
             Note note = iterator.next();
-            if (note.y >= hitAreaHeight - 20 && note.y <= hitAreaHeight + 20) {
-                if ((keyCode == KeyEvent.VK_D && note.x == frameWidth / 48 * 5) ||
-                        (keyCode == KeyEvent.VK_F && note.x == frameWidth / 48 * 17) ||
-                        (keyCode == KeyEvent.VK_J && note.x == frameWidth / 48 * 29) ||
-                        (keyCode == KeyEvent.VK_K && note.x == frameWidth / 48 * 41)) {
+            if (note.y >= hitAreaHeight - 30 && note.y <= hitAreaHeight + 30) {
+                if ((keyCode == KeyEvent.VK_D && note.x == hitAreaWidth[0]) ||
+                        (keyCode == KeyEvent.VK_F && note.x == hitAreaWidth[1]) ||
+                        (keyCode == KeyEvent.VK_J && note.x == hitAreaWidth[2]) ||
+                        (keyCode == KeyEvent.VK_K && note.x == hitAreaWidth[3])) {
                     iterator.remove();
                     score++;
                     perfect++;
+                    combo++;
                 }
-            } else if (note.y <= hitAreaHeight - 21 && note.y >= hitAreaHeight - 60) {
-                if ((keyCode == KeyEvent.VK_D && note.x == frameWidth / 48 * 5) ||
-                        (keyCode == KeyEvent.VK_F && note.x == frameWidth / 48 * 17) ||
-                        (keyCode == KeyEvent.VK_J && note.x == frameWidth / 48 * 29) ||
-                        (keyCode == KeyEvent.VK_K && note.x == frameWidth / 48 * 41)) {
+            } else if (note.y <= hitAreaHeight - 31 && note.y >= hitAreaHeight - 50) {
+                if ((keyCode == KeyEvent.VK_D && note.x == hitAreaWidth[0]) ||
+                        (keyCode == KeyEvent.VK_F && note.x == hitAreaWidth[1]) ||
+                        (keyCode == KeyEvent.VK_J && note.x == hitAreaWidth[2]) ||
+                        (keyCode == KeyEvent.VK_K && note.x == hitAreaWidth[3])) {
                     iterator.remove();
                     score++;
                     good++;
+                    combo++;
                 }
-            } else if (note.y >= hitAreaHeight + 21 && note.y <= hitAreaHeight + 60) {
-                if ((keyCode == KeyEvent.VK_D && note.x == frameWidth / 48 * 5) ||
-                        (keyCode == KeyEvent.VK_F && note.x == frameWidth / 48 * 17) ||
-                        (keyCode == KeyEvent.VK_J && note.x == frameWidth / 48 * 29) ||
-                        (keyCode == KeyEvent.VK_K && note.x == frameWidth / 48 * 41)) {
+            } else if (note.y >= hitAreaHeight + 31 && note.y <= hitAreaHeight + 50) {
+                if ((keyCode == KeyEvent.VK_D && note.x == hitAreaWidth[0]) ||
+                        (keyCode == KeyEvent.VK_F && note.x == hitAreaWidth[1]) ||
+                        (keyCode == KeyEvent.VK_J && note.x == hitAreaWidth[2]) ||
+                        (keyCode == KeyEvent.VK_K && note.x == hitAreaWidth[3])) {
                     iterator.remove();
                     score++;
                     bad++;
+                    combo++;
                 }
             }
         }
-        if(keyCode == KeyEvent.VK_ESCAPE){
+        if (keyCode == KeyEvent.VK_ESCAPE) {
             stop();
-            Result result = new Result(score, perfect, good, bad, miss);
+            Result result = new Result(score, perfect, good, bad, miss, songNumber, maxCombo);
             MenuPage.frame.setContentPane(result);
             // Refresh the frame to show the new content
             MenuPage.frame.revalidate();
@@ -167,7 +182,15 @@ public class Play extends JPanel implements KeyListener, LineListener {
 
         // draw background
         drawBackground((Graphics2D) g);
-        g.drawImage(resizedImage, frameWidth / 2 - iconWidthPropotion / 2, 0, this);
+        switch (songNumber) {
+            case 0:
+                g.drawImage(MozartResizedImage, frameWidth / 2 - iconWidthPropotion / 2, 0, this);
+                break;
+
+            case 1:
+                g.drawImage(SpiritedAwayResizedImage, frameWidth / 2 - iconWidthPropotion / 2, 0, this);
+                break;
+        }
 
         // reset transparent
         resetTransparent((Graphics2D) g);
@@ -192,13 +215,24 @@ public class Play extends JPanel implements KeyListener, LineListener {
         g.drawLine(frameWidth / 4 * 3, 0, frameWidth / 4 * 3, frameHeight);
 
         // display time
-        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.setFont(new Font("Algerian", Font.PLAIN, 24));
         g.drawString("Timer :" + df.format(time) + "s", frameWidth * 8 / 10, frameHeight * 4 / 100);
 
         // draw note
         for (Note note : notes) {
             g.setColor(note.color);
             g.fillOval(note.x, note.y, NOTE_SIZE, NOTE_SIZE);
+        }
+
+        // draw combo
+        g.setFont(new Font("Algerian", Font.PLAIN, 50));
+        g.setColor(Color.WHITE);
+        if (combo >= 2 && combo <= 9) {
+            g.drawString("Combo", frameWidth * 45 / 100, frameHeight * 1 / 10);
+            g.drawString("" + combo, frameWidth * 49 / 100, frameHeight * 2 / 10);
+        } else if (combo >= 10) {
+            g.drawString("Combo", frameWidth * 45 / 100, frameHeight * 1 / 10);
+            g.drawString("" + combo, frameWidth * 48 / 100, frameHeight * 2 / 10);
         }
     }
 
@@ -224,20 +258,36 @@ public class Play extends JPanel implements KeyListener, LineListener {
 
     // load Audio
     public void loadAudio() {
-        try {
-            mozart = AudioSystem.getAudioInputStream(new File("m1.au"));
-            music = AudioSystem.getClip();
-            music.open(mozart);
-            music.addLineListener(this);
-        } catch (Exception e) {
-            e.printStackTrace();
+        switch (songNumber) {
+            case 0:
+                try {
+                    mozart = AudioSystem.getAudioInputStream(new File(".au/mozart.au"));
+                    music = AudioSystem.getClip();
+                    music.open(mozart);
+                    music.addLineListener(this);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case 1:
+                try {
+                    spiritedAway = AudioSystem.getAudioInputStream(new File(".au/AlwaysWithMe.au"));
+                    music = AudioSystem.getClip();
+                    music.open(spiritedAway);
+                    music.addLineListener(this);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
         }
+
     }
 
     // set time
     public void setTime() {
         startTime = System.currentTimeMillis();
-        timer = new Timer(10, new ActionListener() {
+        timer = new Timer(1, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 currentTime = System.currentTimeMillis();
@@ -246,6 +296,7 @@ public class Play extends JPanel implements KeyListener, LineListener {
                 reset();
                 getScore();
                 moveNote();
+                getMaxCombo();
                 repaint();
                 revalidate();
             }
@@ -255,7 +306,7 @@ public class Play extends JPanel implements KeyListener, LineListener {
 
     // control audio
     public void audioControl() {
-        audioTimer = new Timer(2300, new ActionListener() {
+        audioTimer = new Timer(900, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 playMusic();
@@ -283,57 +334,42 @@ public class Play extends JPanel implements KeyListener, LineListener {
             note.y += NOTE_SPEED;
             if (note.y + NOTE_SIZE > frameHeight) {
                 iterator.remove();
-                if(score>0){
-                    score--;
-                }
                 miss++;
+                combo = 0;
             }
         }
+
     }
 
     // set note generate time and position
     public void generateNotes() {
-        generateNoteIfNeeded(300, frameWidth / 48 * 5);
-        generateNoteIfNeeded(825, frameWidth / 48 * 5);
-        generateNoteIfNeeded(1350, frameWidth / 48 * 29);
-        generateNoteIfNeeded(1875, frameWidth / 48 * 29);
-        generateNoteIfNeeded(2400, frameWidth / 48 * 41);
-        generateNoteIfNeeded(2925, frameWidth / 48 * 41);
-        generateNoteIfNeeded(3450, frameWidth / 48 * 29);
-        generateNoteIfNeeded(3975, frameWidth / 48 * 29);
-        generateNoteIfNeeded(4500, frameWidth / 48 * 17);
-        generateNoteIfNeeded(5025, frameWidth / 48 * 17);
-        generateNoteIfNeeded(5550, frameWidth / 48 * 5);
-        generateNoteIfNeeded(6075, frameWidth / 48 * 5);
-        generateNoteIfNeeded(6600, frameWidth / 48 * 41);
-        generateNoteIfNeeded(7125, frameWidth / 48 * 41);
-        generateNoteIfNeeded(7650, frameWidth / 48 * 29);
-        generateNoteIfNeeded(7912, frameWidth / 48 * 5);// first intro
-        generateNoteIfNeeded(9225, frameWidth / 48 * 5);
-        generateNoteIfNeeded(9750, frameWidth / 48 * 5);
-        generateNoteIfNeeded(10275, frameWidth / 48 * 29);
-        generateNoteIfNeeded(10800, frameWidth / 48 * 29);
-        generateNoteIfNeeded(11325, frameWidth / 48 * 41);
-        generateNoteIfNeeded(11850, frameWidth / 48 * 41);
-        generateNoteIfNeeded(12375, frameWidth / 48 * 29);
-        generateNoteIfNeeded(12900, frameWidth / 48 * 29);
-        generateNoteIfNeeded(13425, frameWidth / 48 * 17);
-        generateNoteIfNeeded(13950, frameWidth / 48 * 17);
-        generateNoteIfNeeded(14475, frameWidth / 48 * 5);
-        generateNoteIfNeeded(15000, frameWidth / 48 * 5);
-        generateNoteIfNeeded(15525, frameWidth / 48 * 41);
-        generateNoteIfNeeded(16050, frameWidth / 48 * 41);
-        generateNoteIfNeeded(16575, frameWidth / 48 * 29);
-        generateNoteIfNeeded(16837, frameWidth / 48 * 5);
+        switch (songNumber) {
+            case 0:
+                generateNoteIfNeeded(mozartTiming[0][noteNumber], mozartTiming[1][noteNumber]);
 
-        if (time >= 10000) {
-            stop();
-            Result result = new Result(score, perfect, good, bad, miss);
-            MenuPage.frame.setContentPane(result);
-            // Refresh the frame to show the new content
-            MenuPage.frame.revalidate();
-            MenuPage.frame.repaint();
+                if (time >= 20000) {
+                    stop();
+                    Result result = new Result(score, perfect, good, bad, miss, songNumber, maxCombo);
+                    MenuPage.frame.setContentPane(result);
+                    // Refresh the frame to show the new content
+                    MenuPage.frame.revalidate();
+                    MenuPage.frame.repaint();
+                }
+                break;
+
+            case 1:
+                generateNoteIfNeeded(spiritedAwayTiming[0][noteNumber], spiritedAwayTiming[1][noteNumber]);
+                if (time >= 32100) {
+                    stop();
+                    Result result = new Result(score, perfect, good, bad, miss, songNumber, maxCombo);
+                    MenuPage.frame.setContentPane(result);
+                    // Refresh the frame to show the new content
+                    MenuPage.frame.revalidate();
+                    MenuPage.frame.repaint();
+                }
+                break;
         }
+
     }
 
     public void generateNoteIfNeeded(long targetTime, int position) {
@@ -344,6 +380,29 @@ public class Play extends JPanel implements KeyListener, LineListener {
             notes.add(note);
             noteIndex = (noteIndex + 1);
             notesGeneratedFor = true;
+            runNoteIndex();
+        }
+    }
+
+    private void runNoteIndex() {
+        if (notesGeneratedFor) {
+            switch (songNumber) {
+                case 0:
+                    if (timeIndex != mozartTiming[0].length - 1 && noteNumber != mozartTiming[1].length - 1) {
+                        timeIndex++;
+                        noteNumber++;
+                    }
+                    break;
+
+                case 1:
+                    if (timeIndex != spiritedAwayTiming[0].length - 1
+                            && noteNumber != spiritedAwayTiming[1].length - 1) {
+                        timeIndex++;
+                        noteNumber++;
+                    }
+                    break;
+            }
+            reset();
         }
     }
 
@@ -363,6 +422,7 @@ public class Play extends JPanel implements KeyListener, LineListener {
                 protected void done() {
                     // Reset the flag after the delay
                     notesGeneratedFor = false;
+
                 }
             }.execute();
         }
@@ -392,7 +452,63 @@ public class Play extends JPanel implements KeyListener, LineListener {
         iconWidthPropotion = (int) Math.round((double) iconHeightPropotion / iconHeight * iconWidth);
 
         Image orgImage = icon.getImage();
-        resizedImage = orgImage.getScaledInstance(iconWidthPropotion, iconHeightPropotion,
+        MozartResizedImage = orgImage.getScaledInstance(iconWidthPropotion, iconHeightPropotion,
                 Image.SCALE_SMOOTH);
+
+        icon = new ImageIcon(".img/PlaySpiritedAway.jpg");
+        iconHeight = icon.getIconHeight();
+        iconWidth = icon.getIconWidth();
+        orgImage = icon.getImage();
+        SpiritedAwayResizedImage = orgImage.getScaledInstance(iconWidthPropotion, iconHeightPropotion,
+                Image.SCALE_SMOOTH);
+    }
+
+    private void hitAreaLocation() {
+        hitAreaHeight = frameHeight * 8 / 10;
+        hitAreaWidth[0] = frameWidth * 5 / 48;
+        hitAreaWidth[1] = frameWidth * 17 / 48;
+        hitAreaWidth[2] = frameWidth * 29 / 48;
+        hitAreaWidth[3] = frameWidth * 41 / 48;
+    }
+
+    private void setTiming() {
+        this.mozartTiming = new int[][] {
+                { 400, 925, 1450, 1975, 2500, 3025, 3550, 4075, 4600, 5125, 5650, 6175, 6700, 7225, 7750, 8015, 9325,
+                        9850, 10375, 10900, 11425, 11950, 12475, 13000, 13525, 14050, 14575, 15100, 15625, 16150, 16675,
+                        16937 },
+                { hitAreaWidth[0], hitAreaWidth[0], hitAreaWidth[2], hitAreaWidth[2], hitAreaWidth[3], hitAreaWidth[3],
+                        hitAreaWidth[2], hitAreaWidth[2], hitAreaWidth[1], hitAreaWidth[1], hitAreaWidth[0],
+                        hitAreaWidth[0], hitAreaWidth[3], hitAreaWidth[3], hitAreaWidth[2], hitAreaWidth[0],
+                        hitAreaWidth[0], hitAreaWidth[0], hitAreaWidth[2], hitAreaWidth[2], hitAreaWidth[3],
+                        hitAreaWidth[3], hitAreaWidth[2], hitAreaWidth[2], hitAreaWidth[1], hitAreaWidth[1],
+                        hitAreaWidth[0], hitAreaWidth[0], hitAreaWidth[3], hitAreaWidth[3], hitAreaWidth[2],
+                        hitAreaWidth[0] }
+        };
+
+        this.spiritedAwayTiming = new int[][] {
+                { 4850, 5110, 5370, 5630, 5890, 6670, 6930, 7450, 7970, 8490, 8750, 9010, 9790, 10050, 11090, 11610,
+                        12130, 12650, 12910, 13170, 13690, 14210, 14470, 14690, 15210, 15470, 15730, 15990, 16350,
+                        17440, 17700, 17960, 18220, 18480, 19260, 19520, 20040, 20560, 21080, 21340, 21600, 22120,
+                        22380, 22640, 23940, 24200, 24720, 25240, 25500, 25760, 26280, 26800, 27060, 27320, 27840,
+                        28100, 28360, 28620, 28880 },
+                { hitAreaWidth[0], hitAreaWidth[1], hitAreaWidth[2], hitAreaWidth[0], hitAreaWidth[3], hitAreaWidth[2],
+                        hitAreaWidth[1], hitAreaWidth[3], hitAreaWidth[1], hitAreaWidth[2], hitAreaWidth[1],
+                        hitAreaWidth[3], hitAreaWidth[1], hitAreaWidth[0], hitAreaWidth[2], hitAreaWidth[1],
+                        hitAreaWidth[0], hitAreaWidth[1], hitAreaWidth[2], hitAreaWidth[1], hitAreaWidth[3],
+                        hitAreaWidth[0], hitAreaWidth[2], hitAreaWidth[3], hitAreaWidth[1], hitAreaWidth[2],
+                        hitAreaWidth[0], hitAreaWidth[1], hitAreaWidth[3], hitAreaWidth[1], hitAreaWidth[2],
+                        hitAreaWidth[0], hitAreaWidth[1], hitAreaWidth[2], hitAreaWidth[1], hitAreaWidth[3],
+                        hitAreaWidth[0], hitAreaWidth[2], hitAreaWidth[3], hitAreaWidth[1], hitAreaWidth[2],
+                        hitAreaWidth[0], hitAreaWidth[1], hitAreaWidth[3], hitAreaWidth[1], hitAreaWidth[2],
+                        hitAreaWidth[0], hitAreaWidth[2], hitAreaWidth[3], hitAreaWidth[1], hitAreaWidth[2],
+                        hitAreaWidth[0], hitAreaWidth[1], hitAreaWidth[3], hitAreaWidth[1], hitAreaWidth[2],
+                        hitAreaWidth[0], hitAreaWidth[1], hitAreaWidth[0] }
+        };
+    }
+
+    private void getMaxCombo() {
+        if (combo > maxCombo) {
+            maxCombo = combo;
+        }
     }
 }

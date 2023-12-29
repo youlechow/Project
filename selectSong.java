@@ -8,45 +8,59 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 
-public class selectSong extends JPanel implements MouseListener, ActionListener {
-    private int frameHeight;
-    private int frameWidth;
+public class selectSong extends GamePanel implements MouseListener, ActionListener {
     private JButton next;
     private JButton previous;
     private JButton back;
     private JButton start;
     private ImageIcon backgroundIcon = new ImageIcon(".img/background1.png");
-    private ImageIcon SongImageIcon = new ImageIcon(".img/Mozart.jpeg");
+    private ImageIcon MozartIcon = new ImageIcon(".img/Mozart.jpeg");
+    private ImageIcon SpiritedAwayIcon = new ImageIcon(".img/SpiritedAway.jpg");
     private Image background;
-    private Image songImage;
+    private Image MozartImage;
+    private Image SpiritedAwayImage;
     private int iconWidthPropotion;
     private int iconHeightPropotion;
+    private int songNumber;
+    private int maxCombo;
+    private int highScore;
     private MenuPage menuPage = new MenuPage();
 
-    public selectSong() {
-        this.frameHeight = menuPage.getFrameHeight();
-        this.frameWidth = menuPage.getFrameWidth();
-        loadImage();
-        setLayout(null);
-        initializeButtons();
-        addToPanel();
+    public selectSong(int iconHeightPropotion, int iconWidthPropotion, int songNumber, int maxCombo, int highScore) {
+        this.iconHeightPropotion = iconHeightPropotion;
+        this.iconWidthPropotion = iconWidthPropotion;
+        this.songNumber = songNumber;
+        this.maxCombo = maxCombo;
+        this.highScore = highScore;
     }
 
-    public void initializeButtons() {
+    public selectSong() {
+        this.frameHeight = getFrameHeight();
+        this.frameWidth = getFrameWidth();
+        readData();
+        loadImage();
+        setLayout(null);
+        initializeComponents();
+
+    }
+
+    public void initializeComponents() {
         next = createStyledButton();
         previous = createStyledButton();
         back = createStyledButton1("Back");
         start = createStyledButton1("Start");
 
         // set back & start bounds
-        back.setBounds(frameWidth * 2 / 100, frameHeight * 9 / 10, frameWidth * 1 / 10, frameHeight * 1 / 10);
-        start.setBounds(frameWidth * 86 / 100, frameHeight * 9 / 10, frameWidth * 12 / 100, frameHeight * 1 / 10);
+        back.setBounds(frameWidth * 1 / 100, frameHeight * 9 / 10, frameWidth * 15 / 100, frameHeight * 1 / 10);
+        start.setBounds(frameWidth * 84 / 100, frameHeight * 9 / 10, frameWidth * 15 / 100, frameHeight * 1 / 10);
 
         // load icon
         ImageIcon iconNext = new ImageIcon(".img/next.png");
@@ -66,6 +80,11 @@ public class selectSong extends JPanel implements MouseListener, ActionListener 
         next.setBounds(frameWidth - (iconNext.getIconWidth() + frameWidth * 1 / 100),
                 (frameHeight / 2) - iconPrevious.getIconHeight() / 2,
                 iconNext.getIconWidth(), iconNext.getIconHeight());
+
+        add(next);
+        add(previous);
+        add(back);
+        add(start);
     }
 
     @Override
@@ -79,12 +98,36 @@ public class selectSong extends JPanel implements MouseListener, ActionListener 
         // draw background
         drawBackground((Graphics2D) g);
         g.drawImage(background, 0, 0, this);
-
+        Font scoreFont = new Font("Algerian", Font.BOLD, 30);
+        g.setFont(scoreFont);
+        g.setColor(Color.WHITE);
         // reset transparent
         resetTransparent((Graphics2D) g);
+        switch (songNumber) {
+            case 0:
+                g.drawImage(MozartImage, frameWidth / 2 - iconWidthPropotion / 2,
+                        frameHeight / 2 - iconHeightPropotion / 2,
+                        this);
+                g.drawString("High Score: " + highScore, frameWidth / 2 - iconWidthPropotion / 2,
+                        frameHeight * 19 / 100);
+                g.drawString("Max Combo: " + maxCombo, frameWidth * 6 / 10,
+                        frameHeight * 19 / 100);
+                repaint();
+                revalidate();
+                break;
+            case 1:
+                g.drawImage(SpiritedAwayImage, frameWidth / 2 - iconWidthPropotion / 2,
+                        frameHeight / 2 - iconHeightPropotion / 2,
+                        this);
+                g.drawString("High Score: " + highScore, frameWidth / 2 - iconWidthPropotion / 2,
+                        frameHeight * 19 / 100);
+                g.drawString("Max Combo: " + maxCombo, frameWidth * 6 / 10,
+                        frameHeight * 19 / 100);
+                repaint();
+                revalidate();
+                break;
+        }
 
-        g.drawImage(songImage, frameWidth / 2 - iconWidthPropotion / 2, frameHeight / 2 - iconHeightPropotion / 2,
-                this);
     }
 
     private void drawBackground(Graphics2D g2d) {
@@ -101,6 +144,7 @@ public class selectSong extends JPanel implements MouseListener, ActionListener 
 
     private JButton createStyledButton() {
         JButton button = new JButton();
+        button.addActionListener(this);
         button.addMouseListener(this);
         return button;
     }
@@ -129,12 +173,38 @@ public class selectSong extends JPanel implements MouseListener, ActionListener 
             MenuPage.frame.revalidate();
             MenuPage.frame.repaint();
         } else if (e.getSource() == start) {
-            Play play = new Play();
+            Play play = new Play(songNumber);
             MenuPage.frame.setContentPane(play);
             MenuPage.frame.revalidate();
             MenuPage.frame.repaint();
             play.requestFocusInWindow();
         }
+
+        if (e.getSource() == next && songNumber != 1) {
+            songNumber++;
+            readData();
+            repaint();
+            revalidate();
+        } else if (e.getSource() == next) {
+            songNumber = songNumber - songNumber;
+            readData();
+            readData();
+            repaint();
+            revalidate();
+        }
+
+        if (e.getSource() == previous && songNumber != 0) {
+            songNumber--;
+            readData();
+            repaint();
+            revalidate();
+        } else if (e.getSource() == previous) {
+            songNumber = 1;
+            readData();
+            repaint();
+            revalidate();
+        }
+
     }
 
     // MouseListener methods
@@ -163,24 +233,72 @@ public class selectSong extends JPanel implements MouseListener, ActionListener 
 
     }
 
-    private void addToPanel() {
-        add(next);
-        add(previous);
-        add(back);
-        add(start);
-    }
-
     private void loadImage() {
         Image getImage = backgroundIcon.getImage();
         background = getImage.getScaledInstance(frameWidth, frameHeight, Image.SCALE_SMOOTH);
 
-        int iconHeight = SongImageIcon.getIconHeight();
-        int iconWidth = SongImageIcon.getIconWidth();
+        int iconHeight = SpiritedAwayIcon.getIconHeight();
+        int iconWidth = SpiritedAwayIcon.getIconWidth();
 
         iconHeightPropotion = frameHeight * 6 / 10;
         iconWidthPropotion = (int) Math.round((double) iconHeightPropotion / iconHeight * iconWidth);
 
-        getImage = SongImageIcon.getImage();
-        songImage = getImage.getScaledInstance(iconWidthPropotion, iconHeightPropotion, Image.SCALE_SMOOTH);
+        getImage = SpiritedAwayIcon.getImage();
+        SpiritedAwayImage = getImage.getScaledInstance(iconWidthPropotion, iconHeightPropotion, Image.SCALE_SMOOTH);
+
+        iconHeight = MozartIcon.getIconHeight();
+        iconWidth = MozartIcon.getIconWidth();
+        iconWidthPropotion = (int) Math.round((double) iconHeightPropotion / iconHeight * iconWidth);
+        getImage = MozartIcon.getImage();
+        MozartImage = getImage.getScaledInstance(iconWidthPropotion, iconHeightPropotion, Image.SCALE_SMOOTH);
+    }
+
+    public void readData() {
+        highScore = 0;
+        maxCombo = 0;
+        switch (songNumber) {
+            case 0:
+                try (BufferedReader reader = new BufferedReader(new FileReader(".htr/mozart.txt"))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        String[] data = line.split(",");
+                        int resultScore = Integer.parseInt(data[1]);
+                        int combo = Integer.parseInt(data[7]);
+
+                        if (resultScore > highScore) {
+                            highScore = resultScore;
+                        }
+                        if (combo > maxCombo) {
+                            maxCombo = combo;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case 1:
+                try (BufferedReader reader = new BufferedReader(new FileReader(".htr/spiritedAway.txt"))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        String[] data = line.split(",");
+                        int resultScore = Integer.parseInt(data[1]);
+                        int combo = Integer.parseInt(data[7]);
+
+                        if (resultScore > highScore) {
+                            highScore = resultScore;
+                        }
+                        if (combo > maxCombo) {
+                            maxCombo = combo;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+
+        repaint();
+        revalidate();
     }
 }

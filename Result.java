@@ -6,37 +6,37 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JPanel;
+import java.util.Date;
+import java.io.*;
+import java.text.SimpleDateFormat;
 
-public class Result extends JPanel implements MouseListener, ActionListener {
+public class Result extends GamePanel implements MouseListener, ActionListener {
     private int resultScore;
     private int perfect;
     private int good;
     private int bad;
     private int miss;
-    private int frameHeight;
-    private int frameWidth;
+    private int maxCombo;
+    private int songNumber;
     private JButton restart;
     private JButton selectSong;
-    private MenuPage menuPage = new MenuPage();
-    private Play play = new Play();
+    private Play play = new Play(songNumber);
     private selectSong SelectSong = new selectSong();
 
-    public Result(int resultScore, int perfect, int good, int bad, int miss) {
+    public Result(int resultScore, int perfect, int good, int bad, int miss, int songNumber,int maxCombo) {
         play.stop();
         this.resultScore = resultScore;
-        this.frameHeight = menuPage.getFrameHeight();
-        this.frameWidth = menuPage.getFrameWidth();
         this.perfect = perfect;
         this.good = good;
         this.bad = bad;
         this.miss = miss;
+        this.maxCombo = maxCombo;
+        this.songNumber = songNumber;
         resultScore = play.getScore();
         setLayout(null);
-        initializeButtons();
-        addToPanel();
+        initializeComponents();
+        save();
     }
 
     @Override
@@ -57,28 +57,20 @@ public class Result extends JPanel implements MouseListener, ActionListener {
         g.drawString("Bad : " + bad, frameWidth * 2 / 10, frameHeight * 6 / 10);
         g.setColor(Color.RED);
         g.drawString("Miss : " + miss, frameWidth * 2 / 10, frameHeight * 7 / 10);
+        g.drawString("Max Combo :" + maxCombo, frameWidth * 2 / 10, frameHeight * 8 / 10);
     }
 
-    public void initializeButtons() {
+    public void initializeComponents() {
         restart = createStyledButton("Restart");
         selectSong = createStyledButton("Continue");
         restart.setBounds(frameWidth * 7 / 10, frameHeight * 4 / 10, frameWidth * 2 / 10, frameHeight * 1 / 10);
         selectSong.setBounds(frameWidth * 7 / 10, frameHeight * 5 / 10, frameWidth * 2 / 10, frameHeight * 1 / 10);
 
-    }
-
-    public JButton createStyledButton(String label) {
-        JButton button = new JButton(label);
-        Font font = new Font("Algerian", Font.BOLD, 50);
-        Color color = new Color(88, 217, 246);
-        button.setFont(font);
-        button.addMouseListener(this);
-        button.addActionListener(this);
-        button.setForeground(color);
-        button.setBackground(color);
-        button.setOpaque(false);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        return button;
+        restart.addActionListener(this);
+        selectSong.addActionListener(this);
+        
+        add(restart);
+        add(selectSong);
     }
 
     // MouseListener methods
@@ -105,25 +97,49 @@ public class Result extends JPanel implements MouseListener, ActionListener {
     public void mouseExited(MouseEvent e) {
     }
 
-    public void addToPanel() {
-        add(restart);
-        add(selectSong);
-    }
-
     // ActionListener method
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == restart) {
-            play = new Play();
+            play = new Play(songNumber);
             MenuPage.frame.setContentPane(play);
             MenuPage.frame.revalidate();
             MenuPage.frame.repaint();
             play.requestFocusInWindow();
         } else if (e.getSource() == selectSong) {
+            SelectSong = new selectSong();
             MenuPage.frame.setContentPane(SelectSong);
             MenuPage.frame.revalidate();
             MenuPage.frame.repaint();
         }
     }
 
+    private void save(){
+        switch (songNumber) {
+            case 0:
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(".htr/mozart.txt", true))) {
+                    // Append data to the file
+                    writer.write(getCurrentDateTime() + "," + resultScore + "," + perfect + "," + good + "," + bad + "," + miss + "," + songNumber + "," + maxCombo);
+                    writer.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+        
+            case 1:
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(".htr/spiritedAway.txt", true))) {
+                    // Append data to the file
+                    writer.write(getCurrentDateTime() + "," + resultScore + "," + perfect + "," + good + "," + bad + "," + miss + "," + songNumber + "," + maxCombo);
+                    writer.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+        
+    }
+
+    private String getCurrentDateTime(){
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    }
 }

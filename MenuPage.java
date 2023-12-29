@@ -1,44 +1,26 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-public class MenuPage extends JPanel implements ActionListener, MouseListener {
-    private int frameWidth;
-    private int frameHeight;
+public class MenuPage extends GamePanel implements ActionListener, MouseListener {
     static JFrame frame;
     private JButton start;
     private JButton exit;
     private ImageIcon icon;
     private Image image;
-    private Dimension screenSize;
-
-    protected MenuPage(Dimension screenSize, int frameHeight, int frameWidth) {
-        this.screenSize = screenSize;
-        this.frameHeight = frameHeight;
-        this.frameWidth = frameWidth;
-    }
 
     public MenuPage() {
-        this.screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        this.frameHeight = screenSize.height;
-        this.frameWidth = screenSize.width;
+        super();
         this.initializeBackground();
         this.setLayout(null);
-        this.initializeButtons();
-        this.addButtonsToPanel();
+        this.initializeComponents();
         this.setFocusable(true);
         this.requestFocusInWindow();
     }
@@ -50,55 +32,17 @@ public class MenuPage extends JPanel implements ActionListener, MouseListener {
         g.drawImage(image, 0, 0, this);
     }
 
-    public Dimension getScreenSize() {
-        return screenSize;
-    }
-
-    public int getFrameHeight() {
-        return frameHeight;
-    }
-
-    public int getFrameWidth() {
-        return frameWidth;
-    }
-
-    public void setScreenSize(Dimension screenSize) {
-        this.screenSize = screenSize;
-    }
-
-    public void setFrameHeight(int frameHeight) {
-        this.frameHeight = frameHeight;
-    }
-
-    public void setFrameWidth(int frameWidth) {
-        this.frameWidth = frameWidth;
-    }
-
-    private void initializeButtons() {
+    protected void initializeComponents() {
         start = createStyledButton("Start");
         exit = createStyledButton("Exit");
         start.setBounds(frameWidth / 2 - frameWidth * 2 / 10 / 2, frameHeight * 4 / 10, frameWidth * 2 / 10,
                 frameHeight * 1 / 10);
         exit.setBounds(frameWidth / 2 - frameWidth * 2 / 10 / 2, frameHeight * 5 / 10, frameWidth * 2 / 10,
                 frameHeight * 1 / 10);
-    }
 
-    private JButton createStyledButton(String label) {
-        JButton button = new JButton(label);
-        Font font = new Font("Algerian", Font.BOLD, 50);
-        Color color = new Color(88, 217, 246);
-        button.setFont(font);
-        button.setBackground(Color.white);
-        button.setForeground(color);
-        button.setOpaque(false);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.addActionListener(this);
-        button.addMouseListener(this);
-        return button;
-    }
+        start.addActionListener(this);
+        exit.addActionListener(this);
 
-    private void addButtonsToPanel() {
         add(start);
         add(exit);
     }
