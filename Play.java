@@ -25,10 +25,8 @@ import javax.swing.Timer;
 
 public class Play extends GamePanel implements KeyListener, LineListener {
 
-    // Screen Size
-    private int songNumber;
-
     // Game State
+    private int songNumber;
     private int score;
     private int perfect;
     private int good;
@@ -38,10 +36,13 @@ public class Play extends GamePanel implements KeyListener, LineListener {
     private long currentTime;
     protected long time;
     private Timer timer;
+    private DecimalFormat df = new DecimalFormat();
+    private int combo;
+    private int maxCombo;
 
     // Game Object
     protected int NOTE_SIZE = 60;
-    private int NOTE_SPEED = 5;
+    protected int NOTE_SPEED = 5;
     protected Queue<Note> notes = new LinkedList<>();
     protected int noteIndex;
     private int hitAreaHeight;
@@ -59,14 +60,13 @@ public class Play extends GamePanel implements KeyListener, LineListener {
     private int timeIndex;
     private int noteNumber;
     private int[][] spiritedAwayTiming;
-    // other
-    private DecimalFormat df = new DecimalFormat();
+
+    // game image
     private Image MozartResizedImage;
     private Image SpiritedAwayResizedImage;
     private int iconWidthPropotion;
-    private int combo;
-    private int maxCombo;
 
+    // constructor
     public Play(int score, int perfect, int good, int bad,
             int miss, int timeIndex, int noteNumber, int combo) {
         this.score = score;
@@ -104,6 +104,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
 
     }
 
+    // super class Abstract method
     protected void initializeComponents() {
 
     }
@@ -172,6 +173,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
 
     }
 
+    // draw ui and game object
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -181,7 +183,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         g.fillRect(0, 0, frameWidth, frameHeight);
 
         // draw background
-        drawBackground((Graphics2D) g);
+        setTransparent((Graphics2D) g);
         switch (songNumber) {
             case 0:
                 g.drawImage(MozartResizedImage, frameWidth / 2 - iconWidthPropotion / 2, 0, this);
@@ -216,7 +218,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
 
         // display time
         g.setFont(new Font("Algerian", Font.PLAIN, 24));
-        g.drawString("Timer :" + df.format(time) + "s", frameWidth * 8 / 10, frameHeight * 4 / 100);
+        g.drawString("Timer :" + df.format(time / 1000) + "s", frameWidth * 8 / 10, frameHeight * 4 / 100);
 
         // draw note
         for (Note note : notes) {
@@ -236,12 +238,14 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         }
     }
 
-    private void drawBackground(Graphics2D g2d) {
+    // set transparent
+    private void setTransparent(Graphics2D g2d) {
         float alpha = 0.5f;
         AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
         g2d.setComposite(alphaComposite);
     }
 
+    // reset transparent
     private void resetTransparent(Graphics2D g2d) {
         float alphaOriginal = 1.0f;
         AlphaComposite alphaCompositeOriginal = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaOriginal);
@@ -328,6 +332,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         }
     }
 
+    //move the note from up to down
     public void moveNote() {
         for (Iterator<Note> iterator = notes.iterator(); iterator.hasNext();) {
             Note note = iterator.next();
@@ -359,7 +364,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
 
             case 1:
                 generateNoteIfNeeded(spiritedAwayTiming[0][noteNumber], spiritedAwayTiming[1][noteNumber]);
-                if (time >= 32100) {
+                if (time >= 32000) {
                     stop();
                     Result result = new Result(score, perfect, good, bad, miss, songNumber, maxCombo);
                     MenuPage.frame.setContentPane(result);
@@ -372,6 +377,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
 
     }
 
+    //generate the note in time and the position given
     public void generateNoteIfNeeded(long targetTime, int position) {
         if (time >= targetTime - 10 && time <= targetTime + 10 && !notesGeneratedFor) {
             int x = position;
@@ -384,6 +390,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         }
     }
 
+    //after generate note, continue to the next note
     private void runNoteIndex() {
         if (notesGeneratedFor) {
             switch (songNumber) {
@@ -402,11 +409,10 @@ public class Play extends GamePanel implements KeyListener, LineListener {
                     }
                     break;
             }
-            reset();
         }
     }
 
-    // generate the note on the time
+    //ensure the note have generated and reset flag
     public void reset() {
         // Introduce a delay after generating notes using SwingWorker
         int delayMillis = 1; // Adjust the delay duration as needed
@@ -428,6 +434,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         }
     }
 
+    //stop all the timer and audio
     public void stop() {
         timer.stop();
         audioTimer.stop();
@@ -435,6 +442,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         music.close();
     }
 
+    //get set method
     public int getScore() {
         return score;
     }
@@ -443,6 +451,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         this.score = score;
     }
 
+    //load background image and set size
     private void backgroundImage() {
         ImageIcon icon = new ImageIcon(".img/Mozart.jpeg");
         int iconHeight = icon.getIconHeight();
@@ -463,6 +472,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
                 Image.SCALE_SMOOTH);
     }
 
+    //set the hit x & y position
     private void hitAreaLocation() {
         hitAreaHeight = frameHeight * 8 / 10;
         hitAreaWidth[0] = frameWidth * 5 / 48;
@@ -471,6 +481,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         hitAreaWidth[3] = frameWidth * 41 / 48;
     }
 
+    //set the song note time and position
     private void setTiming() {
         this.mozartTiming = new int[][] {
                 { 400, 925, 1450, 1975, 2500, 3025, 3550, 4075, 4600, 5125, 5650, 6175, 6700, 7225, 7750, 8015, 9325,
@@ -506,6 +517,7 @@ public class Play extends GamePanel implements KeyListener, LineListener {
         };
     }
 
+    //get the higher combo in game
     private void getMaxCombo() {
         if (combo > maxCombo) {
             maxCombo = combo;

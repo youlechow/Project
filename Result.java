@@ -3,15 +3,15 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
-import java.util.Date;
-import java.io.*;
-import java.text.SimpleDateFormat;
 
-public class Result extends GamePanel implements MouseListener, ActionListener {
+public class Result extends GamePanel implements ActionListener {
     private int resultScore;
     private int perfect;
     private int good;
@@ -22,9 +22,9 @@ public class Result extends GamePanel implements MouseListener, ActionListener {
     private JButton restart;
     private JButton selectSong;
     private Play play = new Play(songNumber);
-    private selectSong SelectSong = new selectSong();
+    private SelectSong SelectSong = new SelectSong();
 
-    public Result(int resultScore, int perfect, int good, int bad, int miss, int songNumber,int maxCombo) {
+    public Result(int resultScore, int perfect, int good, int bad, int miss, int songNumber, int maxCombo) {
         play.stop();
         this.resultScore = resultScore;
         this.perfect = perfect;
@@ -39,6 +39,7 @@ public class Result extends GamePanel implements MouseListener, ActionListener {
         save();
     }
 
+    // draw the string
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -60,6 +61,7 @@ public class Result extends GamePanel implements MouseListener, ActionListener {
         g.drawString("Max Combo :" + maxCombo, frameWidth * 2 / 10, frameHeight * 8 / 10);
     }
 
+    // use the super class Abstract method
     public void initializeComponents() {
         restart = createStyledButton("Restart");
         selectSong = createStyledButton("Continue");
@@ -68,33 +70,9 @@ public class Result extends GamePanel implements MouseListener, ActionListener {
 
         restart.addActionListener(this);
         selectSong.addActionListener(this);
-        
+
         add(restart);
         add(selectSong);
-    }
-
-    // MouseListener methods
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
     }
 
     // ActionListener method
@@ -107,39 +85,43 @@ public class Result extends GamePanel implements MouseListener, ActionListener {
             MenuPage.frame.repaint();
             play.requestFocusInWindow();
         } else if (e.getSource() == selectSong) {
-            SelectSong = new selectSong();
+            SelectSong = new SelectSong();
             MenuPage.frame.setContentPane(SelectSong);
             MenuPage.frame.revalidate();
             MenuPage.frame.repaint();
         }
     }
 
-    private void save(){
+    // to save the result and date to file
+    private void save() {
         switch (songNumber) {
             case 0:
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(".htr/mozart.txt", true))) {
                     // Append data to the file
-                    writer.write(getCurrentDateTime() + "," + resultScore + "," + perfect + "," + good + "," + bad + "," + miss + "," + songNumber + "," + maxCombo);
+                    writer.write(getCurrentDateTime() + "," + resultScore + "," + perfect + "," + good + "," + bad + ","
+                            + miss + "," + songNumber + "," + maxCombo);
                     writer.newLine();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 break;
-        
+
             case 1:
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(".htr/spiritedAway.txt", true))) {
                     // Append data to the file
-                    writer.write(getCurrentDateTime() + "," + resultScore + "," + perfect + "," + good + "," + bad + "," + miss + "," + songNumber + "," + maxCombo);
+                    writer.write(getCurrentDateTime() + "," + resultScore + "," + perfect + "," + good + "," + bad + ","
+                            + miss + "," + songNumber + "," + maxCombo);
                     writer.newLine();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 break;
         }
-        
+
     }
 
-    private String getCurrentDateTime(){
+    // set the date format
+    private String getCurrentDateTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
 }

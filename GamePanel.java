@@ -12,6 +12,7 @@ public abstract class GamePanel extends JPanel {
         setLayout(null);
     }
 
+    //set the button style for all
     protected JButton createStyledButton(String label) {
         JButton button = new JButton(label);
         Font font = new Font("Algerian", Font.BOLD, 50);
@@ -25,7 +26,7 @@ public abstract class GamePanel extends JPanel {
         return button;
     }
 
-    // Other common methods can be added here
+    // get set method
     public int getFrameHeight(){
         return frameHeight;
     }
@@ -33,6 +34,14 @@ public abstract class GamePanel extends JPanel {
     public int getFrameWidth(){
         return frameWidth;
     }
-    // Abstract method example (must be implemented in subclasses)
+
+    public void setFrameHeight(int frameHeight){
+        this.frameHeight = frameHeight;
+    }
+
+    public void setFrameWidth(int frameWidth){
+        this.frameWidth = frameWidth;
+    }
+    // Abstract method
     protected abstract void initializeComponents();
 }

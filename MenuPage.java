@@ -2,17 +2,18 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-public class MenuPage extends GamePanel implements ActionListener, MouseListener {
-    static JFrame frame;
+public class MenuPage extends GamePanel implements ActionListener {
+    //frame
+    public static JFrame frame;
+    //button
     private JButton start;
     private JButton exit;
+    //image
     private ImageIcon icon;
     private Image image;
 
@@ -25,6 +26,7 @@ public class MenuPage extends GamePanel implements ActionListener, MouseListener
         this.requestFocusInWindow();
     }
 
+    // draw the background image
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -32,6 +34,7 @@ public class MenuPage extends GamePanel implements ActionListener, MouseListener
         g.drawImage(image, 0, 0, this);
     }
 
+    // use the super class Abstract to set button
     protected void initializeComponents() {
         start = createStyledButton("Start");
         exit = createStyledButton("Exit");
@@ -55,7 +58,7 @@ public class MenuPage extends GamePanel implements ActionListener, MouseListener
             System.out.println();
             System.exit(0);
         } else if (e.getSource() == start) {
-            selectSong selectSong = new selectSong();
+            SelectSong selectSong = new SelectSong();
 
             frame.setContentPane(selectSong);
             // Refresh the frame to show the new content
@@ -64,28 +67,7 @@ public class MenuPage extends GamePanel implements ActionListener, MouseListener
         }
     }
 
-    // MouseListener methods
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
+    // set up the frame
     public void initializeFrame() {
         frame = new JFrame("Menu Page");
         MenuPage menu = new MenuPage();
@@ -97,6 +79,7 @@ public class MenuPage extends GamePanel implements ActionListener, MouseListener
         frame.setVisible(true);
     }
 
+    // load the background image and set size
     public void initializeBackground() {
         icon = new ImageIcon(".img/background1.png");
         Image getImage = icon.getImage();
